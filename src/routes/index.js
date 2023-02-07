@@ -1,0 +1,10 @@
+import express from 'express';
+import customersRoutes from './customersRoutes.js';
+// import gamesRoutes from './gamesRoutes.js';
+// import rentalsRoutes from './rentalsRoutes.js';
+
+const router = express.Router();
+
+router.use([customersRoutes]);
+
+export default router;
