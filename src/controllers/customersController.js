@@ -1,5 +1,9 @@
+import {db} from '../database.connection.js'
+
 export async function listCustomers(req, res){
-	return res.sendStatus(200)
+	const customers = await db.query("SELECT * FROM customers");
+    return res.send(customers.rows);
+	// return res.sendStatus(200)
 }
 
 export async function insertCustomer(req, res){
