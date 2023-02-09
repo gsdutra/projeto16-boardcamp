@@ -24,6 +24,16 @@ export async function insertRental(req,res){
 			return res.sendStatus(400)
 		}
 
+			// -> availability verification
+			let totalStock = await db.query(`SELECT "stockTotal" from games WHERE id = '${rentalData.gameId}'`)
+			totalStock = Number(totalStock.rows[0].stockTotal)
+
+			let usedStock = await db.query(`SELECT * FROM rentals WHERE "gameId" = '${rentalData.gameId}'`)
+			usedStock = Number(usedStock.rows.length)
+
+			console.log(totalStock, usedStock)
+
+			if (totalStock === usedStock) return res.status(400).send("Todos os jogos com esse ID já estão alugados!")
 		// //end validations
 
 		const rentDate = dayjs().get('year')+'-'+(1+dayjs().get('month'))+'-'+dayjs().get('date')
