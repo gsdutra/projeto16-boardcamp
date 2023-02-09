@@ -9,6 +9,6 @@ const rentalsRoutes = express.Router()
 rentalsRoutes.get('/rentals', listRentals)
 rentalsRoutes.post('/rentals', validateRental, insertRental)
 rentalsRoutes.post('/rentals/:id/return', returnRental)
-rentalsRoutes.delete('/rentals', deleteRental)
+rentalsRoutes.delete('/rentals/:id', deleteRental)
 
 export default rentalsRoutes
