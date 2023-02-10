@@ -64,9 +64,41 @@ export async function insertRental(req,res){
 }
 
 export async function returnRental(req,res){
-	return res.sendStatus(200)
+	try {
+		const id = req.params.id
+
+		const returnDate = dayjs().get('year')+'-'+(1+dayjs().get('month'))+'-'+dayjs().get('date')
+
+		const rentalData = await db.query(`SELECT * FROM rentals WHERE id = '${id}'`)
+
+		//validations
+		if (rentalData.rows.length === 0) return res.sendStatus(404)
+		if (rentalData.rows[0].returnDate !== null) return res.sendStatus(400)
+		//end validations
+
+		await db.query(`UPDATE rentals SET "returnDate" = '${returnDate}' WHERE "id" = '${id}'`)
+
+		let rentalDate = rentalData.rows[0].rentDate
+		let daysRented = rentalData.rows[0].daysRented
+
+		const delayedDays = dayjs(returnDate).diff(rentalDate, 'day') - Number(daysRented)
+
+		if (delayedDays >= 1){
+			const unitaryPrice = db.query(`SELECT * FROM games WHERE id = '${rentalData.gameId}'`)
+			const delayFee = delayedDays * unitaryPrice.rows[0].pricePerDay
+			await db.query(`UPDATE rentals SET "delayFee" = '${delayFee}' WHERE "id" = '${id}'`)
+		}
+		
+		return res.sendStatus(200)
+	} catch (error) {
+		res.status(500).send(error.message)
+	}
 }
 
 export async function deleteRental(req,res){
-	return res.sendStatus(200)
+	try {
+		return res.sendStatus(200)
+	} catch (error) {
+		res.status(500).send(error.message)
+	}
 }
