@@ -31,7 +31,9 @@ export async function editCustomer(req, res){
 
 		const cpfAlreadyExists = await db.query(`SELECT * FROM customers WHERE cpf = '${user.cpf}'`)
 
-		if (cpfAlreadyExists.rows.length >= 2) return res.sendStatus(409)
+		console.log(cpfAlreadyExists.rows)
+
+		if (cpfAlreadyExists.rows.length > 0 && cpfAlreadyExists.rows[0].id != id) return res.sendStatus(409)
 
 		const userExists = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
 

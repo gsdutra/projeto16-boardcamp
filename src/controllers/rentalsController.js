@@ -8,11 +8,9 @@ export async function listRentals(req,res){
 		let response = []
 		for (let i = 0; i < rentals.rows.length; i++) {
 
-			let customer = await db.query(`SELECT * FROM customers WHERE id = '${rentals.rows[i].customerId}'`)
+			let customerObj = await db.query(`SELECT * FROM customers WHERE id = '${rentals.rows[i].customerId}'`)
 
-			customer = customer.rows[0]
-
-			delete customer.birthday
+			const customer = {id: customerObj.rows[0].id, name: customerObj.rows[0].name}
 
 			let gameObj = await db.query(`SELECT * FROM games WHERE id = '${rentals.rows[i].gameId}'`)
 
@@ -99,7 +97,7 @@ export async function returnRental(req,res){
 
 		const delayedDays = dayjs(returnDate).diff(rentalDate, 'day') - Number(daysRented)
 
-		if (delayedDays >= 1 || true){
+		if (delayedDays >= 1){
 			console.log(rentalData)
 			const unitaryPrice = await db.query(`SELECT * FROM games WHERE id = '${rentalData.rows[0].gameId}'`)
 			const delayFee = delayedDays * unitaryPrice.rows[0].pricePerDay
