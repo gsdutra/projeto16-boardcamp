@@ -4,7 +4,23 @@ import dayjs from 'dayjs'
 export async function listRentals(req,res){
 	try {
 		const rentals = await db.query(`SELECT * FROM rentals`)
-		return res.status(200).send(rentals.rows)
+
+		let response = []
+		for (let i = 0; i < rentals.rows.length; i++) {
+
+			let customer = await db.query(`SELECT * FROM customers WHERE id = '${rentals.rows[i].customerId}'`)
+
+			customer = customer.rows[0]
+
+			delete customer.birthday
+
+			let gameObj = await db.query(`SELECT * FROM games WHERE id = '${rentals.rows[i].gameId}'`)
+
+			const game = {id: gameObj.rows[0].id, name: gameObj.rows[0].name}
+
+			response.push({...rentals.rows[i], customer, game})
+		}
+		return res.status(200).send(response)
 	} catch {
 		return res.sendStatus(500)
 	}
@@ -83,8 +99,9 @@ export async function returnRental(req,res){
 
 		const delayedDays = dayjs(returnDate).diff(rentalDate, 'day') - Number(daysRented)
 
-		if (delayedDays >= 1){
-			const unitaryPrice = db.query(`SELECT * FROM games WHERE id = '${rentalData.gameId}'`)
+		if (delayedDays >= 1 || true){
+			console.log(rentalData)
+			const unitaryPrice = await db.query(`SELECT * FROM games WHERE id = '${rentalData.rows[0].gameId}'`)
 			const delayFee = delayedDays * unitaryPrice.rows[0].pricePerDay
 			await db.query(`UPDATE rentals SET "delayFee" = '${delayFee}' WHERE "id" = '${id}'`)
 		}
@@ -106,7 +123,7 @@ export async function deleteRental(req,res){
 		if (rentalExists.rows[0].returnDate !== null) return res.sendStatus(400)
 
 		await db.query(`DELETE FROM rentals WHERE id = '${id}'`)
-		
+
 		return res.sendStatus(200)
 	} catch (error) {
 		res.status(500).send(error.message)
