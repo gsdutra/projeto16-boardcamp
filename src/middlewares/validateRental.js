@@ -7,7 +7,7 @@ export async function validateRental(req, res, next){
 		const validation = rentalSchema.validate(rentalData, { abortEarly: true })
 
 		if (validation.error){
-			return res.status(422).send(validation.error.details)
+			return res.status(400).send(validation.error.details)
 		}
 
 		next()

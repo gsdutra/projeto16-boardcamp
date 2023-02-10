@@ -8,7 +8,7 @@ export async function validateCustomer(req, res, next){
 		const validation = customerSchema.validate(userCredentials, { abortEarly: true })
 
 		if (validation.error){
-			return res.status(422).send(validation.error.details)
+			return res.status(400).send(validation.error.details)
 		}
 
 		next()

@@ -31,7 +31,7 @@ export async function editCustomer(req, res){
 
 		const cpfAlreadyExists = await db.query(`SELECT * FROM customers WHERE cpf = '${user.cpf}'`)
 
-		if (cpfAlreadyExists.rows.length > 0) return res.sendStatus(409)
+		if (cpfAlreadyExists.rows.length > 1) return res.sendStatus(409)
 
 		const userExists = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
 
@@ -52,7 +52,7 @@ export async function showSinlgeCustomer(req, res){
 
 		if(userExists.rows.length === 0) return res.sendStatus(404)
 
-		res.status(200).send(user.rows)
+		res.status(200).send(userExists.rows)
 	}catch{
 		res.sendStatus(500)
 	}
